@@ -38,7 +38,7 @@ def alert_chizhevsky(solar_flare, social_unrest_index):
 
 ```bash
 # Clona el repositorio fantoma
-git clone https://github.com/ciberpunk-chizhevsky/consciencia-cosmica.git
+git clone https://github.com/mechmind-dwv/chizhevsky-ai.git
 
 # Instala dependencias con resiliencia soviética
 pip install -r requirements.txt --no-index --find-links ./libs_offline
