@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🌌 Panel de Control Chizhevsky AI</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; background: #0f0f23; color: #fff; }
+        .container { max-width: 1200px; margin: 0 auto; }
+        .header { text-align: center; padding: 20px; background: #1a1a3a; border-radius: 10px; }
+        .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin: 20px 0; }
+        .stat-card { background: #2a2a4a; padding: 20px; border-radius: 10px; text-align: center; }
+        .alert { background: #ff4444; color: white; padding: 10px; border-radius: 5px; margin: 10px 0; }
+        .data-table { width: 100%; border-collapse: collapse; margin: 20px 0; }
+        .data-table th, .data-table td { padding: 10px; text-align: left; border-bottom: 1px solid #444; }
+        .data-table th { background: #2a2a4a; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🌌 Panel de Control Chizhevsky AI</h1>
+            <p>Sistema de monitorización solar basado en los estudios de Alexander Chizhevsky</p>
+        </div>
+
+        <div class="stats">
+            <div class="stat-card">
+                <h3>📊 Total Registros</h3>
+                <p>{{ data.estadisticas.total_registros }}</p>
+            </div>
+            <div class="stat-card">
+                <h3>📈 Riesgo Promedio</h3>
+                <p>{{ (data.estadisticas.riesgo_promedio * 100)|round(1) }}%</p>
+            </div>
+            <div class="stat-card">
+                <h3>⚠️ Riesgo Máximo</h3>
+                <p>{{ (data.estadisticas.riesgo_maximo * 100)|round(1) }}%</p>
+            </div>
+            <div class="stat-card">
+                <h3>🚨 Alertas Altas</h3>
+                <p>{{ data.estadisticas.alertas_altas }}</p>
+            </div>
+        </div>
+
+        <h2>📋 Últimos Datos Solares</h2>
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Fecha/Hora</th>
+                    <th>Llamaradas M</th>
+                    <th>Llamaradas X</th>
+                    <th>Índice Kp</th>
+                    <th>Riesgo</th>
+                    <th>Fuente</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for dato in data.datos_solares %}
+                <tr>
+                    <td>{{ dato[1] }}</td>
+                    <td>{{ dato[2] }}</td>
+                    <td>{{ dato[3] }}</td>
+                    <td>{{ dato[4] }}</td>
+                    <td>{{ (dato[9] * 100)|round(1) }}%</td>
+                    <td>{{ dato[10] }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <h2>🚨 Últimas Alertas</h2>
+        {% for alerta in data.alertas %}
+        <div class="alert">
+            <strong>{{ alerta[2] }} - {{ alerta[3] }}</strong><br>
+            {{ alerta[4] }}<br>
+            <small>{{ alerta[1] }} - Riesgo: {{ (alerta[5] * 100)|round(1) }}%</small>
+        </div>
+        {% else %}
+        <p>✅ No hay alertas recientes</p>
+        {% endfor %}
+    </div>
+
+    <script>
+        // Actualizar automáticamente cada 30 segundos
+        setTimeout(() => { location.reload(); }, 30000);
+    </script>
+</body>
+</html>

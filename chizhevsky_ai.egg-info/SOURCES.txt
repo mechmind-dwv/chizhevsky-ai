@@ -1,0 +1,17 @@
+LICENSE
+README.md
+setup.py
+chizhevsky_ai/__init__.py
+chizhevsky_ai/__main__.py
+chizhevsky_ai.egg-info/PKG-INFO
+chizhevsky_ai.egg-info/SOURCES.txt
+chizhevsky_ai.egg-info/dependency_links.txt
+chizhevsky_ai.egg-info/entry_points.txt
+chizhevsky_ai.egg-info/requires.txt
+chizhevsky_ai.egg-info/top_level.txt
+chizhevsky_ai/core/__init__.py
+chizhevsky_ai/core/brain/__init__.py
+chizhevsky_ai/core/brain/chizhevsky_core.py
+chizhevsky_ai/core/encryption/__init__.py
+chizhevsky_ai/core/solar_api/__init__.py
+chizhevsky_ai/networks/__init__.py
