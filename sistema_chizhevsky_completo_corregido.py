@@ -42,7 +42,7 @@ class SistemaChizhevskyCorregido:
     
     def get_db_connection(self):
         """Crear nueva conexión a la base de datos (thread-safe)"""
-        conn = sqlite3.connect('chizhevsky_alerts.db')
+        conn = sqlite3.connect('data/chizhevsky_alerts.db')
         conn.row_factory = sqlite3.Row
         return conn
     
