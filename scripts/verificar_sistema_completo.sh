@@ -13,8 +13,7 @@ python3 -c "
 import requests
 endpoints = {
     'planetary_k_index': 'https://services.swpc.noaa.gov/json/planetary_k_index_1m.json',
-    'alerts': 'https://services.swpc.noaa.gov/products/alerts.json',
-    'solar_summary': 'https://services.swpc.noaa.gov/json/solar_summary.json'
+    'alerts': 'https://services.swpc.noaa.gov/products/alerts.json'
 }
 
 for name, url in endpoints.items():
@@ -46,7 +45,13 @@ print(f'   Alertas activas: {datos[\"alertas_activas\"]}')
 # 4. Verificar base de datos
 echo ""
 echo "4. 🗄️ Estado de la base de datos:"
-sqlite3 chizhevsky_alerts.db "SELECT COUNT(*) as total, MAX(timestamp) as ultimo, fuente FROM datos_solares GROUP BY fuente;"
+if [ -f "chizhevsky_alerts.db" ]; then
+    sqlite3 chizhevsky_alerts.db "SELECT COUNT(*) as total, MAX(timestamp) as ultimo, fuente FROM datos_solares GROUP BY fuente;"
+else
+    echo "❌ Base de datos no encontrada en ubicación esperada"
+    echo "💡 Buscando en otras ubicaciones..."
+    find . -name "*.db" -o -name "*.sqlite" 2>/dev/null || echo "⚠️  No se encontraron bases de datos"
+fi
 
 # 5. Verificar logs recientes
 echo ""

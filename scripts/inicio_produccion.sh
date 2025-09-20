@@ -18,6 +18,17 @@ if [ ! -f .env ]; then
     exit 1
 fi
 
+# Verificar que la base de datos existe
+if [ ! -f "chizhevsky_alerts.db" ]; then
+    echo "⚠️  Base de datos no encontrada, verificando en data/..."
+    if [ -f "data/chizhevsky_alerts.db" ]; then
+        echo "📦 Moviendo base de datos a ubicación principal..."
+        mv data/chizhevsky_alerts.db .
+    else
+        echo "💡 La base de datos se creará automáticamente al iniciar"
+    fi
+fi
+
 # Verificar dependencias
 echo "🔍 Verificando dependencias..."
 pip install -r requirements.txt
