@@ -1,37 +1,33 @@
 #!/bin/bash
-echo "🔍 VERIFICACIÓN DEL SISTEMA CHIZHEVSKY"
-echo "======================================"
-
-# 1. Verificar servicio
-echo "1. 🚀 ESTADO DEL SERVICIO:"
-if sudo systemctl is-active chizhevsky-final.service >/dev/null; then
-    echo "   ✅ Servicio activo"
-else
-    echo "   ❌ Servicio inactivo"
-fi
-
-# 2. Verificar puertos
-echo ""
-echo "2. 📡 PUERTOS:"
-echo "   Flask (7357): $(netstat -tuln | grep ':7357' >/dev/null && echo '✅ Activo' || echo '❌ Inactivo')"
-echo "   Heliobiologia (5000): $(netstat -tuln | grep ':5000' >/dev/null && echo '✅ Activo' || echo '❌ Inactivo')"
-
-# 3. Verificar base de datos
-echo ""
-echo "3. 🗄️ BASE DE DATOS:"
-if [ -f "chizhevsky_alerts.db" ]; then
-    records=$(sqlite3 chizhevsky_alerts.db "SELECT COUNT(*) FROM datos_solares;")
-    echo "   ✅ $records registros"
-else
-    echo "   ❌ No existe"
-fi
-
-# 4. Verificar APIs
-echo ""
-echo "4. 🌐 CONEXIÓN APIs:"
-curl -s https://services.swpc.noaa.gov/json/solar_summary.json >/dev/null \
-    && echo "   ✅ NOAA Space Weather API" || echo "   ❌ NOAA API offline"
+echo "🔍 Verificando el sistema Chizhevsky AI..."
+echo "📋 Estado del servicio:"
+sudo systemctl status chizhevsky.service --no-pager -l
 
 echo ""
-echo "======================================"
-echo "✅ Verificación completada"
+echo "🌐 Probando conectividad con NOAA..."
+python -c "
+import requests
+try:
+    response = requests.get('https://services.swpc.noaa.gov/products/alerts.json', timeout=10)
+    print('✅ Conexión a alerts.json: OK' if response.status_code == 200 else '❌ Error en alerts.json')
+    
+    response = requests.get('https://services.swpc.noaa.gov/json/planetary_k_index_1m.json', timeout=10)
+    print('✅ Conexión a planetary_k_index: OK' if response.status_code == 200 else '❌ Error en planetary_k_index')
+    
+except Exception as e:
+    print(f'❌ Error de conexión: {e}')
+"
+
+echo ""
+echo "📊 Probando obtención de datos..."
+python -c "
+from parche_noaa_fix import obtener_datos_noaa
+datos = obtener_datos_noaa()
+print(f'✅ Datos obtenidos: {len(datos)} campos')
+print(f'   Último Kp: {datos.get(\"indice_kp\", \"N/A\")}')
+print(f'   Riesgo solar: {datos.get(\"riesgo_solar\", \"N/A\")}%')
+"
+
+echo ""
+echo "📝 Logs recientes del servicio:"
+sudo journalctl -u chizhevsky.service -n 10 --no-pager

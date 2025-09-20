@@ -1,17 +1,51 @@
 # Entornos virtuales
 venv/
 .env
+.env.local
+.env.production
 
-# Logs y datos
-*.log
+# Archivos de base de datos
 *.db
+*.sqlite
 *.sqlite3
 
+# Logs
+*.log
+logs/
+
+# Archivos de backup
+*.backup
+*_backup_*
+backup/
+
 # Archivos temporales
+*.tmp
+*.temp
+tmp/
+temp/
+
+# Archivos de IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Archivos de sistema
+.DS_Store
+Thumbs.db
+
+# Archivos compilados
 __pycache__/
 *.pyc
 *.pyo
+*.pyd
 
-# Configuraciones locales
-config.ini
-secrets.py
+# Distribuciones
+dist/
+build/
+*.egg-info/
+
+# Configuración sensible
+config.json
+secrets.ini
+credentials/*

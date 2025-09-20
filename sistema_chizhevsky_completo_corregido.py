@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-🌌 SISTEMA CHIZHEVSKY CORREGIDO - Sin errores de threading
+🌌 SISTEMA CHIZHEVSKY COMPLETO CORREGIDO - Sin errores de threading
 """
 import os
 import sqlite3
@@ -25,7 +25,7 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 # Configurar puerto
-FLASK_PORT = 27777  # Nuevo puerto para evitar conflictos
+FLASK_PORT = 27777  # Nuevo puerto
 
 class SistemaChizhevskyCorregido:
     def __init__(self):
@@ -64,24 +64,66 @@ class SistemaChizhevskyCorregido:
                 })
             except Exception as e:
                 return jsonify({'error': str(e)}), 500
+
+        @self.app.route('/api/datos')
+        def api_datos():
+            try:
+                conn = self.get_db_connection()
+                datos = conn.execute(
+                    "SELECT * FROM datos_solares ORDER BY id DESC LIMIT 1"
+                ).fetchone()
+                conn.close()
+                
+                if datos:
+                    return jsonify({
+                        'id': datos['id'],
+                        'timestamp': datos['timestamp'],
+                        'llamaradas_m': datos['llamaradas_m'],
+                        'llamaradas_x': datos['llamaradas_x'],
+                        'indice_kp': datos['indice_kp'],
+                        'velocidad_viento_solar': datos['velocidad_viento_solar'],
+                        'densidad_viento_solar': datos['densidad_viento_solar'],
+                        'protones_10mev': datos['protones_10mev'],
+                        'protones_100mev': datos['protones_100mev'],
+                        'riesgo_solar': datos['riesgo_solar'],
+                        'fuente': datos['fuente']
+                    })
+                return jsonify({'error': 'No hay datos disponibles'}), 404
+            except Exception as e:
+                return jsonify({'error': str(e)}), 500
+
+        @self.app.route('/status')
+        def status():
+            return jsonify({
+                'status': 'active',
+                'timestamp': datetime.now().isoformat(),
+                'system': 'Chizhevsky AI - Corregido',
+                'port': FLASK_PORT
+            })
     
     def get_spaceweather_data(self):
-        """Obtener datos de Space Weather API"""
+        """Obtener datos de Space Weather API desde endpoints funcionales"""
         try:
-            url = "https://services.swpc.noaa.gov/json/solar_summary.json"
-            response = requests.get(url, timeout=15)
+            # Importar y usar el nuevo fetcher
+            from noaa_fix import obtener_datos_noaa_actualizados
+            datos = obtener_datos_noaa_actualizados()
             
-            if response.status_code == 200:
-                data = response.json()
-                return self.process_spaceweather_data(data)
-            else:
-                logger.warning(f"⚠️ Error Space Weather API: {response.status_code}")
-                return self.get_fallback_data()
+            # Adaptar al formato esperado por el sistema
+            return {
+                'llamaradas_m': datos['llamaradas_m'],
+                'llamaradas_x': datos['llamaradas_x'],
+                'indice_kp': datos['indice_kp'],
+                'viento_velocidad': datos['velocidad_viento_solar'],
+                'viento_densidad': datos['densidad_viento_solar'],
+                'protones_10mev': datos['protones_10mev'],
+                'protones_100mev': datos['protones_100mev'],
+                'riesgo': datos['riesgo_solar'] / 100.0,  # Convertir de porcentaje a decimal
+                'fuente': datos['fuente']
+            }
                 
         except Exception as e:
             logger.error(f"Error obteniendo datos: {e}")
             return self.get_fallback_data()
-    
     def process_spaceweather_data(self, data):
         """Procesar datos de Space Weather API"""
         return {
@@ -207,41 +249,3 @@ class SistemaChizhevskyCorregido:
 if __name__ == "__main__":
     sistema = SistemaChizhevskyCorregido()
     sistema.run()
-
-        @self.app.route('/api/datos')
-
-     def api_datos():
-            try:
-                conn = self.get_db_connection()
-                datos = conn.execute(
-                    "SELECT * FROM datos_solares ORDER BY id DESC LIMIT 1"
-                ).fetchone()
-                conn.close()
-                
-                if datos:
-                    return jsonify({
-                        'id': datos['id'],
-                        'timestamp': datos['timestamp'],
-                        'llamaradas_m': datos['llamaradas_m'],
-                        'llamaradas_x': datos['llamaradas_x'],
-                        'indice_kp': datos['indice_kp'],
-                        'velocidad_viento_solar': datos['velocidad_viento_solar'],
-                        'densidad_viento_solar': datos['densidad_viento_solar'],
-                        'protones_10mev': datos['protones_10mev'],
-                        'protones_100mev': datos['protones_100mev'],
-                        'riesgo_solar': datos['riesgo_solar'],
-                        'fuente': datos['fuente']
-                    })
-                return jsonify({'error': 'No hay datos disponibles'}), 404
-            except Exception as e:
-                return jsonify({'error': str(e)}), 500
-
-      @self.app.route('/status')
-
-    def status():
-            return jsonify({
-                'status': 'active',
-                'timestamp': datetime.now().isoformat(),
-                'system': 'Chizhevsky AI - Corregido',
-                'port': FLASK_PORT
-            })
