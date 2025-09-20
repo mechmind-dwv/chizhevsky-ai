@@ -9,8 +9,9 @@ import numpy as np
 from datetime import datetime, timedelta
 import time
 import logging
+from chizhevsky_ai.core.hematology.integrator import HematologyIntegrator
 from dotenv import load_dotenv
-from flask import Flask, jsonify
+from flask import Flask, jsonify, request, current_app
 import threading
 
 # Configurar logging
@@ -32,6 +33,7 @@ class SistemaChizhevskyCorregido:
         self.load_environment()
         self.app = Flask(__name__)
         self.setup_routes()
+        self.hematology_integrator = HematologyIntegrator(self)
         
     def load_environment(self):
         """Cargar variables de entorno"""
@@ -100,6 +102,29 @@ class SistemaChizhevskyCorregido:
                 'system': 'Chizhevsky AI - Corregido',
                 'port': FLASK_PORT
             })
+            
+        @self.app.route('/api/hematology/risk')
+        def hematology_risk():
+            try:
+                solar_data = self.get_spaceweather_data()
+                risk_assessment = self.hematology_integrator.generate_hematology_alert(
+                    solar_data.get('riesgo', 0) * 10  # Convertir a escala 0-10
+                )
+                return jsonify(risk_assessment)
+            except Exception as e:
+                return jsonify({'error': str(e)}), 500
+
+        @self.app.route('/api/hematology/analysis', methods=['POST'])
+        def hematology_analysis():
+            try:
+                data = request.json
+                analysis = self.hematology_integrator.hematology.calculate_erythrocyte_electrical_properties(
+                    data.get('sedimentation_rate', 0), 
+                    data.get('environmental_ions', 0)
+                )
+                return jsonify(analysis)
+            except Exception as e:
+                return jsonify({'error': str(e)}), 500
     
     def get_spaceweather_data(self):
         """Obtener datos de Space Weather API desde endpoints funcionales"""
@@ -124,20 +149,7 @@ class SistemaChizhevskyCorregido:
         except Exception as e:
             logger.error(f"Error obteniendo datos: {e}")
             return self.get_fallback_data()
-    def process_spaceweather_data(self, data):
-        """Procesar datos de Space Weather API"""
-        return {
-            'llamaradas_m': data.get('xray_flares_m', 0),
-            'llamaradas_x': data.get('xray_flares_x', 0),
-            'indice_kp': data.get('kp_index', 2.0),
-            'viento_velocidad': data.get('solar_wind_speed', 400),
-            'viento_densidad': data.get('solar_wind_density', 4.0),
-            'protones_10mev': data.get('proton_flux_10mev', 100),
-            'protones_100mev': data.get('proton_flux_100mev', 10),
-            'riesgo': self.calculate_risk_from_data(data),
-            'fuente': 'NOAA_SPACE_WEATHER'
-        }
-    
+            
     def get_fallback_data(self):
         """Datos de fallback"""
         hora_actual = datetime.now().hour
@@ -219,7 +231,8 @@ class SistemaChizhevskyCorregido:
             f"🚀 <b>SISTEMA CHIZHEVSKY CORREGIDO</b>\n\n"
             f"✅ Sin errores de threading\n"
             f"🌐 Puerto: {FLASK_PORT}\n"
-            f"📊 Base de datos optimizada"
+            f"📊 Base de datos optimizada\n"
+            f"🩸 Módulo de hematología integrado"
         )
         
         # Bucle principal
