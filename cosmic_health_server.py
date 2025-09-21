@@ -59,3 +59,13 @@ if __name__ == '__main__':
     print("🚀 Servidor de Salud Cósmica iniciado en http://localhost:27779")
     print("📊 Dashboard disponible en: http://localhost:27779/")
     app.run(host='0.0.0.0', port=27779, debug=False)
+
+@app.route('/cosmic-dashboard')
+def cosmic_dashboard():
+    """Dashboard web de salud cósmica"""
+    return render_template('cosmic_health_dashboard.html')
+
+@app.route('/')
+def index():
+    """Página principal redirige al dashboard"""
+    return redirect('/cosmic-dashboard')

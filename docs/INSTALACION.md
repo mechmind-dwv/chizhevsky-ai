@@ -11,71 +11,28 @@
    ```bash
    git clone https://github.com/mechmind-dwv/chizhevsky-ai.git
    cd chizhevsky-ai
-¡Excelente! Veo que tu proyecto **Chizhevsky AI** ya está en GitHub y funcionando correctamente. Permíteme ayudarte a organizar y asegurar el proyecto de manera profesional:
+   ```
 
-## 📦 **ORGANIZACIÓN DEL PROYECTO EN GITHUB**
+2. **Configurar entorno virtual**
+   ```bash
+   python -m venv venv
+   source venv/bin/activate
+   pip install -r requirements.txt
+   ```
 
-### 1. **Limpiar archivos temporales y de backup**
-```bash
-# Eliminar archivos de backup y temporales que no deben estar en GitHub
-rm -f *_backup_*.py *.backup*.py *temp*.py *test*.py *patch*.py
+3. **Configurar variables de entorno**
+   ```bash
+   cp config/.env.example .env
+   # Editar .env con tus API keys reales
+   nano .env
+   ```
 
-# Mantener solo los archivos esenciales
-ls -la
-```
+4. **Iniciar el sistema**
+   ```bash
+   python sistema_chizhevsky_completo_corregido.py
+   ```
 
-### 2. **Actualizar el .gitignore para mayor seguridad**
-```bash
-# Mejorar el .gitignore para proyectos Python
-cat > .gitignore << 'EOF'
-# Entornos virtuales
-venv/
-.env
-.env.local
-.env.production
-
-# Archivos de base de datos
-*.db
-*.sqlite
-*.sqlite3
-
-# Logs
-*.log
-logs/
-
-# Archivos de backup
-*.backup
-*_backup_*
-backup/
-
-# Archivos temporales
-*.tmp
-*.temp
-tmp/
-temp/
-
-# Archivos de IDE
-.vscode/
-.idea/
-*.swp
-*.swo
-
-# Archivos de sistema
-.DS_Store
-Thumbs.db
-
-# Archivos compilados
-__pycache__/
-*.pyc
-*.pyo
-*.pyd
-
-# Distribuciones
-dist/
-build/
-*.egg-info/
-
-# Configuración sensible
-config.json
-secrets.ini
-credentials/*
+5. **Verificar instalación**
+   ```bash
+   ./scripts/verificar_sistema_completo.sh
+   ```
