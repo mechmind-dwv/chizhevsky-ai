@@ -9,7 +9,10 @@ import numpy as np
 from datetime import datetime, timedelta
 import time
 import logging
+from flask import render_template
 from chizhevsky_ai.core.hematology.integrator import HematologyIntegrator
+from hospital_integration.oms_connector_simple import CosmicHealthConnector
+from predictive_analytics.cosmic_predictor_simple import CosmicPredictor
 from dotenv import load_dotenv
 from flask import Flask, jsonify, request, current_app
 import threading
@@ -34,6 +37,8 @@ class SistemaChizhevskyCorregido:
         self.app = Flask(__name__)
         self.setup_routes()
         self.hematology_integrator = HematologyIntegrator(self)
+        self.health_connector = CosmicHealthConnector()
+        self.predictor = CosmicPredictor()
         
     def load_environment(self):
         """Cargar variables de entorno"""
@@ -50,6 +55,11 @@ class SistemaChizhevskyCorregido:
     
     def setup_routes(self):
         """Configurar rutas de Flask"""
+        
+        @self.app.route('/hematology')
+        def hematology_dashboard():
+            return render_template('hematology_dashboard.html')
+        
         @self.app.route('/')
         def dashboard():
             try:
@@ -262,3 +272,211 @@ class SistemaChizhevskyCorregido:
 if __name__ == "__main__":
     sistema = SistemaChizhevskyCorregido()
     sistema.run()
+
+# ==================== NUEVOS PODERES CÓSMICOS ====================
+
+from hospital_integration.oms_connector_simple import CosmicHealthConnector
+from predictive_analytics.cosmic_predictor_simple import CosmicPredictor
+
+class SistemaChizhevskyMejorado(SistemaChizhevskyCorregido):
+    def __init__(self):
+        super().__init__()
+        self.health_connector = CosmicHealthConnector()
+        self.predictor = CosmicPredictor()
+        self.setup_enhanced_routes()
+    
+    def setup_enhanced_routes(self):
+        """Configurar rutas mejoradas"""
+        @self.app.route('/api/cosmic/health-status')
+        def cosmic_health_status():
+            try:
+                solar_data = self.get_spaceweather_data()
+                health_data = self.health_connector.get_oms_health_alerts()
+                predictions = self.predictor.predict_health_impact({
+                    'activity_level': solar_data.get('riesgo', 0) * 10
+                })
+                
+                return jsonify({
+                    'solar_activity': solar_data.get('riesgo', 0) * 10,
+                    'health_alerts': health_data,
+                    'predictions': predictions,
+                    'timestamp': datetime.now().isoformat(),
+                    'system_status': 'cosmic_enhanced'
+                })
+            except Exception as e:
+                return jsonify({'error': str(e)}), 500
+        
+        @self.app.route('/api/hospital/metrics')
+        def hospital_metrics():
+            try:
+                metrics = self.health_connector.get_hospital_metrics('default')
+                return jsonify(metrics)
+            except Exception as e:
+                return jsonify({'error': str(e)}), 500
+        
+        @self.app.route('/api/early-warnings')
+        def early_warnings():
+            try:
+                warnings = self.predictor.generate_early_warnings()
+                return jsonify(warnings)
+            except Exception as e:
+                return jsonify({'error': str(e)}), 500
+
+# Reemplazar la clase principal
+if __name__ == "__main__":
+    sistema = SistemaChizhevskyMejorado()
+    sistema.run()
+
+# ==================== NUEVOS PODERES CÓSMICOS ====================
+
+from hospital_integration.oms_connector_simple import CosmicHealthConnector
+from predictive_analytics.cosmic_predictor_simple import CosmicPredictor
+
+class SistemaChizhevskyMejorado(SistemaChizhevskyCorregido):
+    def __init__(self):
+        super().__init__()
+        self.health_connector = CosmicHealthConnector()
+        self.predictor = CosmicPredictor()
+        self.setup_enhanced_routes()
+    
+    def setup_enhanced_routes(self):
+        """Configurar rutas mejoradas"""
+        @self.app.route('/api/cosmic/health-status')
+        def cosmic_health_status():
+            try:
+                solar_data = self.get_spaceweather_data()
+                health_data = self.health_connector.get_oms_health_alerts()
+                predictions = self.predictor.predict_health_impact({
+                    'activity_level': solar_data.get('riesgo', 0) * 10
+                })
+                
+                return jsonify({
+                    'solar_activity': solar_data.get('riesgo', 0) * 10,
+                    'health_alerts': health_data,
+                    'predictions': predictions,
+                    'timestamp': datetime.now().isoformat(),
+                    'system_status': 'cosmic_enhanced'
+                })
+            except Exception as e:
+                return jsonify({'error': str(e)}), 500
+        
+        @self.app.route('/api/hospital/metrics')
+        def hospital_metrics():
+            try:
+                metrics = self.health_connector.get_hospital_metrics('default')
+                return jsonify(metrics)
+            except Exception as e:
+                return jsonify({'error': str(e)}), 500
+        
+        @self.app.route('/api/early-warnings')
+        def early_warnings():
+            try:
+                warnings = self.predictor.generate_early_warnings()
+                return jsonify(warnings)
+            except Exception as e:
+                return jsonify({'error': str(e)}), 500
+
+# Reemplazar la clase principal
+if __name__ == "__main__":
+    sistema = SistemaChizhevskyMejorado()
+    sistema.run()
+
+# ========== COSMIC UPGRADE INYECTADO ==========
+from hospital_integration.oms_connector_simple import CosmicHealthConnector
+from predictive_analytics.cosmic_predictor_simple import CosmicPredictor
+
+# Modificar la clase principal para añadir nuevas capacidades
+original_init = SistemaChizhevskyCorregido.__init__
+original_setup_routes = SistemaChizhevskyCorregido.setup_routes
+
+
+        @self.app.route('/api/cosmic/health-status')
+        def cosmic_health_status():
+            try:
+                solar_data = self.get_spaceweather_data()
+                health_data = self.health_connector.get_oms_health_alerts()
+                predictions = self.predictor.predict_health_impact({
+                    'activity_level': solar_data.get('riesgo', 0) * 10
+                })
+                
+                return jsonify({
+                    'solar_activity': solar_data.get('riesgo', 0) * 10,
+                    'health_alerts': health_data,
+                    'predictions': predictions,
+                    'timestamp': datetime.now().isoformat()
+                })
+            except Exception as e:
+                return jsonify({'error': str(e)}), 500
+
+        @self.app.route('/api/hospital/metrics')
+        def hospital_metrics():
+            try:
+                metrics = self.health_connector.get_hospital_metrics('default')
+                return jsonify(metrics)
+            except Exception as e:
+                return jsonify({'error': str(e)}), 500
+
+        @self.app.route('/api/early-warnings')
+        def early_warnings():
+            try:
+                warnings = self.predictor.generate_early_warnings()
+                return jsonify(warnings)
+            except Exception as e:
+                return jsonify({'error': str(e)}), 500
+
+def new_init(self):
+    original_init(self)
+    self.health_connector = CosmicHealthConnector()
+    self.predictor = CosmicPredictor()
+
+def new_setup_routes(self):
+    original_setup_routes(self)
+    
+        @self.app.route('/api/cosmic/health-status')
+    def cosmic_health_status():
+        try:
+            solar_data = self.get_spaceweather_data()
+            health_data = self.health_connector.get_oms_health_alerts()
+            predictions = self.predictor.predict_health_impact({
+                'activity_level': solar_data.get('riesgo', 0) * 10
+            })
+            
+            return jsonify({
+                'solar_activity': solar_data.get('riesgo', 0) * 10,
+                'health_alerts': health_data,
+                'predictions': predictions,
+                'timestamp': datetime.now().isoformat()
+            })
+        except Exception as e:
+            return jsonify({'error': str(e)}), 500
+
+        @self.app.route('/api/hospital/metrics')
+    def hospital_metrics():
+        try:
+            metrics = self.health_connector.get_hospital_metrics('default')
+            return jsonify(metrics)
+        except Exception as e:
+            return jsonify({'error': str(e)}), 500
+
+        @self.app.route('/api/early-warnings')
+    def early_warnings():
+        try:
+            warnings = self.predictor.generate_early_warnings()
+            return jsonify(warnings)
+        except Exception as e:
+            return jsonify({'error': str(e)}), 500
+
+# Aplicar el parche
+SistemaChizhevskyCorregido.__init__ = new_init
+SistemaChizhevskyCorregido.setup_routes = new_setup_routes
+
+# Añadir esta ruta en setup_routes()
+@app.route('/api/cosmic/proxy/<path:subpath>')
+def cosmic_proxy(subpath):
+    """Proxy para el servidor de salud cósmica"""
+    try:
+        import requests
+        response = requests.get(f'http://localhost:27779/cosmic-api/{subpath}', timeout=5)
+        return response.json(), response.status_code
+    except Exception as e:
+        return jsonify({'error': f'Proxy error: {str(e)}'}), 502

@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Salud Cósmica - Dashboard Simple</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; background: #f0f0f0; }
+        .container { max-width: 1000px; margin: 0 auto; }
+        .card { background: white; padding: 20px; margin: 10px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .metric { font-size: 24px; font-weight: bold; }
+        .alert { background: #ff4444; color: white; padding: 10px; border-radius: 4px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🚑 Dashboard de Salud Cósmica</h1>
+        
+        <div class="card">
+            <h2>🌞 Actividad Solar</h2>
+            <div class="metric" id="solar">Cargando...</div>
+            <div id="solar-status"></div>
+        </div>
+        
+        <div class="card">
+            <h2>🏥 Estado Hospitalario</h2>
+            <div>Camas ocupadas: <span id="beds">0</span>%</div>
+            <div>Casos críticos: <span id="critical">0</span></div>
+            <div>Personal médico: <span id="staff">0</span></div>
+        </div>
+        
+        <div class="card">
+            <h2>🔮 Predicciones</h2>
+            <div>Casos esperados: <span id="expected">0</span></div>
+            <div>Demanda de sangre: <span id="blood">0</span> unidades</div>
+        </div>
+    </div>
+
+    <script>
+        async function updateData() {
+            try {
+                const [metrics, health] = await Promise.all([
+                    fetch('/cosmic-api/hospital/metrics').then(r => r.json()),
+                    fetch('/cosmic-api/health-status').then(r => r.json())
+                ]);
+                
+                // Actualizar actividad solar
+                document.getElementById('solar').textContent = health.solar_activity.toFixed(2);
+                document.getElementById('solar-status').textContent = 
+                    'Nivel: ' + health.emergency_level;
+                
+                // Actualizar hospital
+                document.getElementById('beds').textContent = metrics.bed_occupancy;
+                document.getElementById('critical').textContent = metrics.critical_cases;
+                document.getElementById('staff').textContent = metrics.medical_staff;
+                
+                // Actualizar predicciones
+                document.getElementById('expected').textContent = health.predictions.expected_emergency_cases;
+                document.getElementById('blood').textContent = health.predictions.predicted_blood_demand;
+                
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        }
+        
+        // Actualizar inmediatamente y cada 30 segundos
+        updateData();
+        setInterval(updateData, 30000);
+    </script>
+</body>
+</html>

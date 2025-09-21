@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>🌌 DASHBOARD CÓSMICO CHIZHEVSKY AI</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body { 
+            font-family: 'Courier New', monospace; 
+            background: #0a0a0a; 
+            color: #00ff00; 
+            margin: 0; 
+            padding: 20px; 
+        }
+        .cosmic-container { max-width: 1400px; margin: 0 auto; }
+        .cosmic-header { 
+            text-align: center; 
+            padding: 20px; 
+            border-bottom: 3px solid #00ff00; 
+            margin-bottom: 30px; 
+            background: linear-gradient(90deg, #001100, #003300);
+        }
+        .cosmic-grid { 
+            display: grid; 
+            grid-template-columns: 1fr 1fr 1fr; 
+            gap: 20px; 
+            margin-bottom: 30px;
+        }
+        .cosmic-card { 
+            background: #1a1a1a; 
+            padding: 20px; 
+            border-radius: 8px; 
+            border: 2px solid #00ff00; 
+            box-shadow: 0 0 15px rgba(0, 255, 0, 0.3);
+        }
+        .cosmic-metric { 
+            font-size: 28px; 
+            font-weight: bold; 
+            color: #00ff00; 
+            text-shadow: 0 0 10px #00ff00;
+        }
+        .alert-critical { 
+            background: #ff4444; 
+            animation: cosmic-pulse 1s infinite; 
+        }
+        @keyframes cosmic-pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.7; }
+            100% { opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+    <div class="cosmic-container">
+        <div class="cosmic-header">
+            <h1>🌌 SISTEMA CHIZHEVSKY AI - DASHBOARD CÓSMICO</h1>
+            <p>Integración Solar + Hospitales + OMS + Predicciones</p>
+        </div>
+        
+        <div class="cosmic-grid">
+            <div class="cosmic-card" id="solar-card">
+                <h2>☀️ ACTIVIDAD SOLAR</h2>
+                <div class="cosmic-metric" id="solar-level">--</div>
+                <div id="solar-impact">Impacto: --</div>
+            </div>
+            
+            <div class="cosmic-card" id="health-card">
+                <h2>🏥 ESTADO HOSPITALARIO</h2>
+                <div id="hospital-metrics">Cargando...</div>
+            </div>
+            
+            <div class="cosmic-card" id="prediction-card">
+                <h2>🔮 PREDICCIONES</h2>
+                <div id="predictions">Analizando...</div>
+            </div>
+            
+            <div class="cosmic-card" style="grid-column: span 3;">
+                <h2>📈 METRICAS GLOBALES</h2>
+                <canvas id="cosmic-chart" width="400" height="200"></canvas>
+            </div>
+            
+            <div class="cosmic-card" style="grid-column: span 3;">
+                <h2>🚨 ALERTAS TEMPRANAS</h2>
+                <div id="early-warnings" class="cosmic-alerts"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Implementar aquí el JavaScript cósmico para el dashboard mejorado
+        async function updateCosmicDashboard() {
+            try {
+                const response = await fetch('/api/cosmic/health-status');
+                const cosmicData = await response.json();
+                
+                // Actualizar métricas cósmicas
+                document.getElementById('solar-level').textContent = 
+                    cosmicData.solar_activity.toFixed(1);
+                document.getElementById('solar-impact').textContent = 
+                    `Impacto: ${cosmicData.predictions.cardiac_risk_level.toFixed(1)}/5.0`;
+                
+                // Aquí más lógica de actualización...
+                
+            } catch (error) {
+                console.error('Error cósmico:', error);
+            }
+        }
+        
+        // Iniciar actualizaciones cósmicas
+        setInterval(updateCosmicDashboard, 10000);
+        updateCosmicDashboard();
+    </script>
+</body>
+</html>

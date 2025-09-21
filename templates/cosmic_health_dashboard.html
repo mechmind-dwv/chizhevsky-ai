@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🚑 Dashboard de Salud Cósmica - Chizhevsky AI</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --critical: #ff4444;
+            --high: #ffaa44;
+            --moderate: #44ff44;
+            --low: #4444ff;
+        }
+        body {
+            font-family: 'Courier New', monospace;
+            background: #0a0a0a;
+            color: white;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        .header {
+            text-align: center;
+            padding: 20px;
+            border-bottom: 2px solid var(--moderate);
+            margin-bottom: 30px;
+        }
+        .alert-banner {
+            background: var(--critical);
+            padding: 15px;
+            text-align: center;
+            font-weight: bold;
+            animation: blink 2s infinite;
+            margin-bottom: 20px;
+        }
+        @keyframes blink {
+            50% { opacity: 0.7; }
+        }
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        .card {
+            background: #1a1a1a;
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid #333;
+        }
+        .metric {
+            font-size: 24px;
+            font-weight: bold;
+        }
+        .solar-critical { color: var(--critical); }
+        .solar-high { color: var(--high); }
+        .solar-moderate { color: var(--moderate); }
+        .solar-low { color: var(--low); }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🚑 DASHBOARD DE SALUD CÓSMICA</h1>
+            <p>Sistema Chizhevsky AI - Monitor en tiempo real</p>
+        </div>
+
+        <div id="alert-banner" class="alert-banner" style="display: none;">
+            ⚠️ ALERTA: Actividad solar crítica detectada - Protocolos de emergencia activados
+        </div>
+
+        <div class="dashboard-grid">
+            <!-- Tarjeta de Actividad Solar -->
+            <div class="card">
+                <h2>🌞 ACTIVIDAD SOLAR</h2>
+                <div class="metric" id="solar-level">0.0</div>
+                <div id="solar-status">Nivel: CARGANDO...</div>
+                <canvas id="solar-chart" width="400" height="200"></canvas>
+            </div>
+
+            <!-- Tarjeta de Estado Hospitalario -->
+            <div class="card">
+                <h2>🏥 ESTADO HOSPITALARIO</h2>
+                <div>Camas ocupadas: <span id="bed-occupancy">0</span>%</div>
+                <div>Casos críticos: <span id="critical-cases">0</span></div>
+                <div>Admisiones emergencia: <span id="emergency-admissions">0</span></div>
+                <div>Stock sangre: <span id="blood-supply">0</span> unidades</div>
+                <canvas id="hospital-chart" width="400" height="200"></canvas>
+            </div>
+
+            <!-- Predicciones -->
+            <div class="card" style="grid-column: span 2;">
+                <h2>🔮 PREDICCIONES</h2>
+                <div id="predictions">
+                    <div>Casos emergencia esperados: <span id="expected-cases">0</span></div>
+                    <div>Demanda sanguínea prevista: <span id="blood-demand">0</span> unidades</div>
+                    <div>Nivel riesgo cardíaco: <span id="cardiac-risk">0</span>/5</div>
+                </div>
+                <canvas id="predictions-chart" width="400" height="200"></canvas>
+            </div>
+
+            <!-- Recomendaciones -->
+            <div class="card" style="grid-column: span 2;">
+                <h2>🎯 RECOMENDACIONES</h2>
+                <div id="recommendations">
+                    <p>Cargando recomendaciones...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Charts
+        const solarChart = new Chart(document.getElementById('solar-chart'), {
+            type: 'line', data: { labels: [], datasets: [{ label: 'Actividad Solar', data: [], borderColor: '#ff4444', tension: 0.1 }] },
+            options: { scales: { y: { beginAtZero: true, max: 10 } } }
+        });
+
+        const hospitalChart = new Chart(document.getElementById('hospital-chart'), {
+            type: 'bar', data: { labels: ['Camas', 'Críticos', 'Emergencias', 'Sangre'], datasets: [{ label: 'Métricas', data: [0, 0, 0, 0], backgroundColor: ['#ff4444', '#ffaa44', '#44ff44', '#4444ff'] }] }
+        });
+
+        // Actualizar dashboard
+        async function updateDashboard() {
+            try {
+                const [metrics, health] = await Promise.all([
+                    fetch('/cosmic-api/hospital/metrics').then(r => r.json()),
+                    fetch('/cosmic-api/health-status').then(r => r.json())
+                ]);
+
+                // Actualizar actividad solar
+                const solarActivity = health.solar_activity;
+                document.getElementById('solar-level').textContent = solarActivity.toFixed(2);
+                document.getElementById('solar-level').className = 'metric ' + 
+                    (solarActivity > 8 ? 'solar-critical' : solarActivity > 6 ? 'solar-high' : solarActivity > 4 ? 'solar-moderate' : 'solar-low');
+                
+                document.getElementById('solar-status').textContent = 
+                    'Nivel: ' + (solarActivity > 8 ? 'CRÍTICO' : solarActivity > 6 ? 'ALTO' : solarActivity > 4 ? 'MODERADO' : 'BAJO');
+
+                // Actualizar hospital
+                document.getElementById('bed-occupancy').textContent = metrics.bed_occupancy;
+                document.getElementById('critical-cases').textContent = metrics.critical_cases;
+                document.getElementById('emergency-admissions').textContent = metrics.emergency_admissions;
+                document.getElementById('blood-supply').textContent = metrics.blood_supply;
+
+                // Actualizar predicciones
+                document.getElementById('expected-cases').textContent = health.predictions.expected_emergency_cases;
+                document.getElementById('blood-demand').textContent = health.predictions.predicted_blood_demand;
+                document.getElementById('cardiac-risk').textContent = health.predictions.cardiac_risk_level.toFixed(1);
+
+                // Actualizar charts
+                updateCharts(solarActivity, metrics, health);
+
+                // Mostrar/ocultar alerta
+                document.getElementById('alert-banner').style.display = 
+                    solarActivity > 7 ? 'block' : 'none';
+
+            } catch (error) {
+                console.error('Error updating dashboard:', error);
+            }
+        }
+
+        function updateCharts(solarActivity, metrics, health) {
+            // Solar chart
+            const now = new Date().toLocaleTimeString();
+            solarChart.data.labels.push(now);
+            solarChart.data.datasets[0].data.push(solarActivity);
+            if (solarChart.data.labels.length > 15) {
+                solarChart.data.labels.shift();
+                solarChart.data.datasets[0].data.shift();
+            }
+            solarChart.update();
+
+            // Hospital chart
+            hospitalChart.data.datasets[0].data = [
+                metrics.bed_occupancy,
+                metrics.critical_cases,
+                metrics.emergency_admissions,
+                metrics.blood_supply / 10 // Escalar para visualización
+            ];
+            hospitalChart.update();
+        }
+
+        // Iniciar actualizaciones
+        updateDashboard();
+        setInterval(updateDashboard, 30000);
+    </script>
+</body>
+</html>

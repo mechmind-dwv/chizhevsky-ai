@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🩸 Panel de Hematología - Sistema Chizhevsky AI</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body { font-family: 'Courier New', monospace; background: #0a0a0a; color: #00ff00; margin: 0; padding: 20px; }
+        .container { max-width: 1200px; margin: 0 auto; }
+        .header { text-align: center; padding: 20px; border-bottom: 2px solid #00ff00; margin-bottom: 30px; }
+        .dashboard-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .card { background: #1a1a1a; padding: 20px; border-radius: 8px; border: 1px solid #00ff00; }
+        .alert-critical { background: #ff4444; color: white; animation: blink 1s infinite; }
+        @keyframes blink { 50% { opacity: 0.5; } }
+        .metric { font-size: 24px; font-weight: bold; color: #00ff00; }
+        .recommendations { background: #2a2a2a; padding: 15px; border-radius: 5px; margin-top: 10px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header"><h1>🩸 ELECTROHEMODINÁMICA CHIZHEVSKY</h1><p>Monitor en tiempo real</p></div>
+        <div class="dashboard-grid">
+            <div class="card" id="risk-card"><h2>⚡ RIESGO HEMATOLÓGICO</h2><div class="metric" id="risk-level">CARGANDO...</div><div id="solar-activity">Actividad solar: --</div></div>
+            <div class="card"><h2>🔬 ANÁLISIS SANGUÍNEO</h2><div id="blood-analysis"><div>Potencial eléctrico: <span id="potential">--</span> mV</div><div>Efecto iónico: <span id="ion-effect">--</span></div><div>Sedimentación: <span id="sedimentation">--</span></div></div></div>
+            <div class="card" style="grid-column: span 2;"><h2>📈 TENDENCIA DE RIESGO</h2><canvas id="risk-chart" width="400" height="200"></canvas></div>
+            <div class="card" style="grid-column: span 2;"><h2>🎯 RECOMENDACIONES</h2><div class="recommendations" id="recommendations"><p>Cargando recomendaciones...</p></div></div>
+        </div>
+    </div>
+    <script>
+        const riskChart = new Chart(document.getElementById('risk-chart'), {
+            type: 'line', data: { labels: [], datasets: [{ label: 'Nivel de Riesgo', data: [], borderColor: '#00ff00', tension: 0.1 }] },
+            options: { scales: { y: { beginAtZero: true, max: 10 } } }
+        });
+        
+        async function updateDashboard() {
+            try {
+                const riskResponse = await fetch('/api/hematology/risk');
+                const riskData = await riskResponse.json();
+                document.getElementById('risk-level').textContent = riskData.hematology_risk;
+                document.getElementById('solar-activity').textContent = `Actividad solar: ${riskData.solar_activity}`;
+                const recsHtml = riskData.recommendations.map(r => `<p>• ${r}</p>`).join('');
+                document.getElementById('recommendations').innerHTML = recsHtml;
+                const now = new Date().toLocaleTimeString();
+                riskChart.data.labels.push(now);
+                riskChart.data.datasets[0].data.push(riskData.solar_activity);
+                if (riskChart.data.labels.length > 20) {
+                    riskChart.data.labels.shift();
+                    riskChart.data.datasets[0].data.shift();
+                }
+                riskChart.update();
+                const riskCard = document.getElementById('risk-card');
+                if (riskData.solar_activity >= 7.0) {
+                    riskCard.classList.add('alert-critical');
+                } else {
+                    riskCard.classList.remove('alert-critical');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        }
+        
+        async function updateBloodAnalysis() {
+            try {
+                const analysisResponse = await fetch('/api/hematology/analysis', {
+                    method: 'POST', headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({sedimentation_rate: 18 + Math.random() * 4, environmental_ions: 3 + Math.random() * 2})
+                });
+                const analysisData = await analysisResponse.json();
+                document.getElementById('potential').textContent = analysisData.electrical_potential.toFixed(2);
+                document.getElementById('ion-effect').textContent = analysisData.ion_effect.toFixed(2);
+                document.getElementById('sedimentation').textContent = analysisData.sedimentation_effect.toFixed(2);
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        }
+        
+        updateDashboard(); updateBloodAnalysis();
+        setInterval(updateDashboard, 30000); setInterval(updateBloodAnalysis, 60000);
+    </script>
+</body>
+</html>
