@@ -1,0 +1,40 @@
+ESTADO DEL SISTEMA CHIZHEVSKY AI - Sun Sep 21 04:04:23 AM CEST 2025
+==========================================
+COMMIT: 64d6d8e
+VERSION: v1.1.0
+FECHA: Sun Sep 21 04:04:23 AM CEST 2025
+SISTEMA: Linux min-PPPPP-CCC-MMMMMMMM 6.8.0-83-generic #83-Ubuntu SMP PREEMPT_DYNAMIC Fri Sep  5 21:46:54 UTC 2025 x86_64 x86_64 x86_64 GNU/Linux
+
+SERVICIOS:
+- Principal: inactive
+NO INICIADO
+- Salud: INACTIVO (se inicia on-demand)
+
+BASE DE DATOS:
+- Tamaño: 53248 bytes
+- Registros: 182
+- Tablas: alertas                  hematology_analysis    
+datos_solares            hematology_correlations
+
+ENDPOINTS DISPONIBLES:
+- http://localhost:27777/ (API Principal)
+- http://localhost:27779/ (Salud Cósmica) - Iniciar con: python cosmic_health_server.py
+- http://localhost:27777/api/hematology/risk (Riesgo Hematológico)
+
+ÚLTIMOS DATOS:
+2025-09-21 00:54:54|NOAA_REAL|0.0|0.0
+2025-09-21 00:49:53|NOAA_REAL|0.0|0.0
+2025-09-21 00:44:48|NOAA_REAL|0.0|0.0
+2025-09-21 00:39:47|NOAA_REAL|0.0|0.0
+2025-09-21 00:39:37|NOAA_REAL|0.0|0.0
+
+ARCHIVOS IMPORTANTES:
+- sistema_chizhevsky_completo_corregido.py (servidor principal)
+- cosmic_health_server.py (servidor de salud)  
+- health_monitor.py (monitor en tiempo real)
+- chizhevsky_alerts.db (base de datos)
+
+RECOMENDACIONES:
+- Revisar .env para configurar API keys reales
+- Configurar systemd para servicio de salud si se desea
+- Monitorear logs: sudo journalctl -u chizhevsky.service -f
