@@ -210,38 +210,36 @@ if __name__ == "__main__":
 
         @self.app.route('/api/datos')
 
-     def api_datos():
-            try:
-                conn = self.get_db_connection()
-                datos = conn.execute(
-                    "SELECT * FROM datos_solares ORDER BY id DESC LIMIT 1"
-                ).fetchone()
-                conn.close()
-                
-                if datos:
-                    return jsonify({
-                        'id': datos['id'],
-                        'timestamp': datos['timestamp'],
-                        'llamaradas_m': datos['llamaradas_m'],
-                        'llamaradas_x': datos['llamaradas_x'],
-                        'indice_kp': datos['indice_kp'],
-                        'velocidad_viento_solar': datos['velocidad_viento_solar'],
-                        'densidad_viento_solar': datos['densidad_viento_solar'],
-                        'protones_10mev': datos['protones_10mev'],
-                        'protones_100mev': datos['protones_100mev'],
-                        'riesgo_solar': datos['riesgo_solar'],
-                        'fuente': datos['fuente']
-                    })
-                return jsonify({'error': 'No hay datos disponibles'}), 404
-            except Exception as e:
-                return jsonify({'error': str(e)}), 500
+     # Busca la sección donde está @app.route('/') y agrega después:
 
-      @self.app.route('/status')
-
-    def status():
+@app.route('/api/datos')
+def api_datos():
+    try:
+        cursor = get_db_connection().cursor()
+        cursor.execute("SELECT * FROM datos_solares ORDER BY id DESC LIMIT 1")
+        row = cursor.fetchone()
+        if row:
             return jsonify({
-                'status': 'active',
-                'timestamp': datetime.now().isoformat(),
-                'system': 'Chizhevsky AI - Corregido',
-                'port': FLASK_PORT
+                "id": row[0],
+                "timestamp": row[1],
+                "llamaradas_m": row[2],
+                "llamaradas_x": row[3], 
+                "indice_kp": row[4],
+                "velocidad_viento_solar": row[5],
+                "densidad_viento_solar": row[6],
+                "protones_10mev": row[7],
+                "protones_100mev": row[8],
+                "riesgo_solar": row[9],
+                "fuente": row[10]
             })
+        return jsonify({"error": "No data"}), 404
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+@app.route('/status')
+def status():
+    return jsonify({
+        "status": "active",
+        "timestamp": datetime.now().isoformat(),
+        "system": "Chizhevsky AI - Corregido"
+    })

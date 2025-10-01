@@ -72,23 +72,41 @@ class NOAADataFetcher:
 
         return datos
 
-    def calcular_riesgo(self, alerts_data):
-        """Calcular riesgo solar basado en alertas"""
-        riesgo = 0.0
-        for alerta in alerts_data:
-            if isinstance(alerta, dict):
-                mensaje = alerta.get('message', '')
-                # Lógica de cálculo de riesgo basada en alertas
-                if 'G3' in mensaje or 'Strong' in mensaje:
-                    riesgo = max(riesgo, 80.0)
-                elif 'G2' in mensaje or 'Moderate' in mensaje:
-                    riesgo = max(riesgo, 60.0)
-                elif 'G1' in mensaje or 'Minor' in mensaje:
-                    riesgo = max(riesgo, 40.0)
-                elif 'Warning' in mensaje:
-                    riesgo = max(riesgo, 20.0)
-        return riesgo
-
+    # Mejorar la función calcular_riesgo en noaa_fix.py
+def calcular_riesgo_mejorado(self, alerts_data, kp_value):
+    """Calcular riesgo solar mejorado"""
+    riesgo = 0.0
+    
+    # Riesgo basado en Kp index
+    if kp_value >= 7: riesgo += 70.0
+    elif kp_value >= 5: riesgo += 50.0
+    elif kp_value >= 4: riesgo += 30.0
+    elif kp_value >= 3: riesgo += 15.0
+    
+    # Riesgo basado en alertas
+    for alerta in alerts_data:
+        if isinstance(alerta, dict):
+            mensaje = alerta.get('message', '')
+            product_id = alerta.get('product_id', '')
+            
+            # Alertas de tormenta geomagnética
+            if 'G3' in mensaje or 'Strong' in mensaje:
+                riesgo = max(riesgo, 80.0)
+            elif 'G2' in mensaje or 'Moderate' in mensaje:
+                riesgo = max(riesgo, 60.0)
+            elif 'G1' in mensaje or 'Minor' in mensaje:
+                riesgo = max(riesgo, 40.0)
+            
+            # Alertas de protones
+            if 'PX1' in product_id or 'Proton' in mensaje:
+                riesgo += 20.0
+                
+            # Alertas de electrones
+            if 'EF3' in product_id or 'Electron' in mensaje:
+                riesgo += 15.0
+    
+    return min(riesgo, 100.0)  # Máximo 100%
+    
     def datos_fallback(self):
         """Datos de fallback en caso de error"""
         return {
@@ -108,62 +126,3 @@ class NOAADataFetcher:
 def obtener_datos_noaa_actualizados():
     fetcher = NOAADataFetcher()
     return fetcher.obtener_datos_solares()
-
-    def calcular_riesgo_mejorado(self, alerts_data, kp_value):
-        """Calcular riesgo solar mejorado"""
-        riesgo = 0.0
-        
-        # Riesgo basado en Kp index
-        if kp_value >= 7: riesgo += 70.0
-        elif kp_value >= 5: riesgo += 50.0
-        elif kp_value >= 4: riesgo += 30.0
-        elif kp_value >= 3: riesgo += 15.0
-        
-        # Riesgo basado en alertas
-        for alerta in alerts_data:
-            if isinstance(alerta, dict):
-                mensaje = alerta.get('message', '')
-                product_id = alerta.get('product_id', '')
-                
-                # Alertas de tormenta geomagnética
-                if 'G3' in mensaje or 'Strong' in mensaje:
-                    riesgo = max(riesgo, 80.0)
-                elif 'G2' in mensaje or 'Moderate' in mensaje:
-                    riesgo = max(riesgo, 60.0)
-                elif 'G1' in mensaje or 'Minor' in mensaje:
-                    riesgo = max(riesgo, 40.0)
-                
-                # Alertas de protones
-                if 'PX1' in product_id or 'Proton' in mensaje:
-                    riesgo += 20.0
-                    
-                # Alertas de electrones
-                if 'EF3' in product_id or 'Electron' in mensaje:
-                    riesgo += 15.0
-        
-        return min(riesgo, 100.0)  # Máximo 100%
-
-    def obtener_datos_completos(self):
-        """Obtener datos de múltiples endpoints de NOAA"""
-        try:
-            # Endpoints adicionales que podrían funcionar
-            endpoints = {
-                'solar_wind': 'https://services.swpc.noaa.gov/json/ace/swepam/ace_swepam_1h.json',
-                'proton_flux': 'https://services.swpc.noaa.gov/json/goes/primary/proton-flux-1-day.json',
-                'xray_flux': 'https://services.swpc.noaa.gov/json/goes/primary/xray-flux-1-day.json'
-            }
-            
-            datos_extra = {}
-            for name, url in endpoints.items():
-                try:
-                    response = requests.get(url, headers=self.headers, timeout=5)
-                    if response.status_code == 200:
-                        datos_extra[name] = response.json()
-                except:
-                    pass  # Ignorar errores en endpoints opcionales
-            
-            return datos_extra
-            
-        except Exception as e:
-            print(f"Error obteniendo datos extra: {e}")
-            return {}
